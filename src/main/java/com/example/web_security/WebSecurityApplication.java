@@ -9,5 +9,4 @@ public class WebSecurityApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(WebSecurityApplication.class, args);
 	}
-
 }
