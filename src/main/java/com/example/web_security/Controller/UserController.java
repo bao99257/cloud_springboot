@@ -69,55 +69,66 @@ public class UserController {
         return "admin";
     }
 
+    // Trang hiển thị thông tin user
     @GetMapping("/user")
     public String userPage(Authentication authentication, Model model) {
-        Users user = userRepository.findByUsername(authentication.getName()).get();
+        Users user = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
         model.addAttribute("user", user);
         return "user";
     }
 
-    @GetMapping("/admin/edit/{id}")
-    public String editUser(@PathVariable Long id, Model model) {
-        Users user = userRepository.findById(id).orElseThrow();
+    // Trang chỉnh sửa thông tin user
+    @GetMapping("/user/edit")
+    public String editUserPage(Authentication authentication, Model model) {
+        Users user = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
         model.addAttribute("user", user);
-        return "edit";
+        return "user_edit";
     }
 
-    @PostMapping("/admin/update")
-public String updateUser(@ModelAttribute Users user) {
-    // Lấy user hiện tại từ database dựa trên ID
-    Users existingUser = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-    // Cập nhật các trường khác
-    existingUser.setUsername(user.getUsername());
-    existingUser.setName(user.getName());
-    existingUser.setAge(user.getAge());
-    existingUser.setAddress(user.getAddress());
-    existingUser.setRole(user.getRole());
-
-    // Chỉ cập nhật mật khẩu nếu người dùng nhập mật khẩu mới
-    if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-        existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
-    }
-
-    // Lưu lại user
-    userRepository.save(existingUser);
-    return "redirect:/admin";
-}
-
-    @GetMapping("/admin/delete/{id}")
-    public String deleteUser(@PathVariable Long id) {
-        userRepository.deleteById(id);
-        return "redirect:/admin";
-    }
-
+    // Xử lý cập nhật thông tin user
     @PostMapping("/user/update")
     public String updatePersonalInfo(Authentication authentication, @ModelAttribute Users user) {
-        Users currentUser = userRepository.findByUsername(authentication.getName()).get();
+        Users currentUser = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
         currentUser.setName(user.getName());
         currentUser.setAge(user.getAge());
         currentUser.setAddress(user.getAddress());
         userRepository.save(currentUser);
         return "redirect:/user";
+    }
+
+    // Trang chỉnh sửa user trong admin
+    @GetMapping("/admin/edit/{id}")
+    public String editUser(@PathVariable Long id, Model model) {
+        Users user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        model.addAttribute("user", user);
+        return "edit";
+    }
+
+    // Xử lý cập nhật user trong admin
+    @PostMapping("/admin/update")
+    public String updateUser(@ModelAttribute Users user) {
+        Users existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        existingUser.setUsername(user.getUsername());
+        existingUser.setName(user.getName());
+        existingUser.setAge(user.getAge());
+        existingUser.setAddress(user.getAddress());
+        existingUser.setRole(user.getRole());
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        userRepository.save(existingUser);
+        return "redirect:/admin";
+    }
+
+    // Xóa user trong admin
+    @GetMapping("/admin/delete/{id}")
+    public String deleteUser(@PathVariable Long id) {
+        userRepository.deleteById(id);
+        return "redirect:/admin";
     }
 }
