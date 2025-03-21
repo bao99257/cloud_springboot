@@ -1,33 +1,31 @@
-// package com.example.web_security.Service;
+package com.example.web_security.service;
 
 
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.security.core.userdetails.UserDetails;
-// import org.springframework.security.core.userdetails.UserDetailsService;
-// import org.springframework.security.core.userdetails.UsernameNotFoundException;
-// import org.springframework.stereotype.Service;
+import com.example.web_security.Repo.UsersRepository;
+import com.example.web_security.model.Users;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
-// import com.example.web_security.Repo.UserRepository;
-// import com.example.web_security.model.User;
+import java.util.Collections;
 
-// import org.springframework.security.core.authority.SimpleGrantedAuthority;
+@Service
+public class CustomUserDetailsService implements UserDetailsService {
 
-// import java.util.stream.Collectors;
+    @Autowired
+    private UsersRepository usersRepository;
 
-// @Service
-// public class CustomUserDetailsService implements UserDetailsService {
-
-//     @Autowired
-//     private UserRepository userRepository;
-
-//     @Override
-//     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//         User user = userRepository.findByUsername(username)
-//             .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng: " + username));
-//         return new org.springframework.security.core.userdetails.User(
-//             user.getUsername(),
-//             user.getPassword(),
-//             user.getRoles().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
-//         );
-//     }
-// }
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Users user = usersRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        return User.builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .authorities(user.getRole())
+                .build();
+    }
+}

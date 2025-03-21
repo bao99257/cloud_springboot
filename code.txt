@@ -1,0 +1,174 @@
+Phần 1: Kiểm tra các endpoint API (dùng JWT)
+Các endpoint API nằm dưới /api/** và sử dụng JWT để xác thực. Chúng ta sẽ kiểm tra từng endpoint một cách có hệ thống.
+
+Bước 1: Kiểm tra endpoint /api/welcome (không cần xác thực)
+Mục đích: Đây là endpoint công khai, không yêu cầu token, dùng để kiểm tra xem API có hoạt động không.
+Request:
+Method: GET
+URL: http://localhost:8080/api/welcome
+Headers: Không cần thêm header Authorization.
+Body: Không cần.
+Phản hồi mong đợi:
+Status: 200 OK
+Body: "Welcome to the API!"
+Bước 2: Đăng ký người dùng mới qua /api/register (không cần xác thực)
+Mục đích: Đăng ký một người dùng mới để sử dụng trong các bước tiếp theo.
+Request:
+Method: POST
+URL: http://localhost:8080/api/register
+Headers:
+Content-Type: application/json
+Body (JSON):
+json
+
+Collapse
+
+Wrap
+
+Copy
+{
+    "username": "vanthanh",
+    "password": "123",
+    "name": "Văn Thanh",
+    "age": 10,
+    "address": "Hà Nội"
+}
+Phản hồi mong đợi:
+Status: 200 OK
+Body: "User registered successfully"
+Lưu ý: Nếu người dùng vanthanh đã tồn tại, bạn có thể thay đổi username (ví dụ: vanthanh2).
+Bước 3: Lấy token JWT qua /api/generateToken (không cần xác thực)
+Mục đích: Sử dụng thông tin đăng nhập của người dùng vừa đăng ký để lấy token JWT.
+Request:
+Method: POST
+URL: http://localhost:8080/api/generateToken
+Headers:
+Content-Type: application/json
+Body (JSON):
+json
+
+Collapse
+
+Wrap
+
+Copy
+{
+    "username": "vanthanh",
+    "password": "123"
+}
+Phản hồi mong đợi:
+Status: 200 OK
+Body: Một token JWT (ví dụ: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+Lưu ý: Lưu lại token này để sử dụng trong các bước tiếp theo. Nếu nhận được lỗi Invalid credentials, hãy kiểm tra lại username và password.
+Bước 4: Kiểm tra endpoint /api/user/profile (yêu cầu token, ROLE_USER hoặc ROLE_ADMIN)
+Mục đích: Lấy thông tin hồ sơ của người dùng hiện tại (dựa trên token).
+Request:
+Method: GET
+URL: http://localhost:8080/api/user/profile
+Headers:
+Authorization: Bearer <token> (thay <token> bằng token nhận được từ bước 3)
+Body: Không cần.
+Phản hồi mong đợi:
+Status: 200 OK
+Body: Thông tin của người dùng vanthanh (ví dụ: {"username": "vanthanh", "name": "Văn Thanh", "age": 10, "address": "Hà Nội", "role": "ROLE_USER"})
+Lưu ý: Nếu nhận được lỗi 401 Unauthorized, hãy kiểm tra lại token trong header Authorization.
+Bước 5: Cập nhật hồ sơ người dùng qua /api/user/update (yêu cầu token, ROLE_USER hoặc ROLE_ADMIN)
+Mục đích: Cập nhật thông tin hồ sơ của người dùng hiện tại.
+Request:
+Method: PUT
+URL: http://localhost:8080/api/user/update
+Headers:
+Authorization: Bearer <token> (dùng token từ bước 3)
+Content-Type: application/json
+Body (JSON):
+json
+
+Collapse
+
+Wrap
+
+Copy
+{
+    "name": "Văn Thanh Updated",
+    "age": 11,
+    "address": "Hà Nội Updated"
+}
+Phản hồi mong đợi:
+Status: 200 OK
+Body: "Profile updated successfully"
+Kiểm tra lại: Gọi lại /api/user/profile để xác nhận thông tin đã được cập nhật.
+Bước 6: Lấy token cho tài khoản admin (ROLE_ADMIN)
+Mục đích: Lấy token cho tài khoản admin để kiểm tra các endpoint yêu cầu quyền ROLE_ADMIN.
+Request:
+Method: POST
+URL: http://localhost:8080/api/generateToken
+Headers:
+Content-Type: application/json
+Body (JSON):
+json
+
+Collapse
+
+Wrap
+
+Copy
+{
+    "username": "admin",
+    "password": "admin123"
+}
+Phản hồi mong đợi:
+Status: 200 OK
+Body: Một token JWT (ví dụ: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+Lưu ý: Tài khoản admin đã được tạo tự động trong UserRestController (phương thức initAdmin). Lưu lại token này để sử dụng trong các bước tiếp theo.
+Bước 7: Kiểm tra endpoint /api/admin/users (yêu cầu token, ROLE_ADMIN)
+Mục đích: Lấy danh sách tất cả người dùng (chỉ admin mới có quyền truy cập).
+Request:
+Method: GET
+URL: http://localhost:8080/api/admin/users
+Headers:
+Authorization: Bearer <admin-token> (dùng token của tài khoản admin từ bước 6)
+Body: Không cần.
+Phản hồi mong đợi:
+Status: 200 OK
+Body: Danh sách tất cả người dùng (ví dụ: [{"username": "admin", ...}, {"username": "vanthanh", ...}])
+Kiểm tra lỗi quyền: Thử gọi endpoint này với token của vanthanh (ROLE_USER), bạn sẽ nhận được lỗi 403 Forbidden.
+Bước 8: Cập nhật thông tin người dùng qua /api/admin/users/{id} (yêu cầu token, ROLE_ADMIN)
+Mục đích: Admin cập nhật thông tin của một người dùng (dựa trên ID).
+Lưu ý: Từ bước 7, bạn đã có danh sách người dùng. Hãy lấy ID của người dùng vanthanh (giả sử ID là 2).
+Request:
+Method: PUT
+URL: http://localhost:8080/api/admin/users/2 (thay 2 bằng ID của vanthanh)
+Headers:
+Authorization: Bearer <admin-token> (dùng token của admin)
+Content-Type: application/json
+Body (JSON):
+json
+
+Collapse
+
+Wrap
+
+Copy
+{
+    "username": "vanthanh",
+    "name": "Văn Thanh Admin Updated",
+    "age": 12,
+    "address": "Hà Nội Admin Updated",
+    "role": "ROLE_USER"
+}
+Phản hồi mong đợi:
+Status: 200 OK
+Body: "User updated by admin"
+Kiểm tra lại: Gọi /api/admin/users để xác nhận thông tin của vanthanh đã được cập nhật.
+Bước 9: Xóa người dùng qua /api/admin/users/{id} (yêu cầu token, ROLE_ADMIN)
+Mục đích: Admin xóa một người dùng (dựa trên ID).
+Request:
+Method: DELETE
+URL: http://localhost:8080/api/admin/users/2 (thay 2 bằng ID của vanthanh)
+Headers:
+Authorization: Bearer <admin-token> (dùng token của admin)
+Body: Không cần.
+Phản hồi mong đợi:
+Status: 200 OK
+Body: "User deleted successfully"
+Kiểm tra lại: Gọi /api/admin/users để xác nhận người dùng vanthanh đã bị xóa.

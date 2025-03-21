@@ -21,7 +21,7 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // Tạo tài khoản admin mặc định
+    
     @PostConstruct
     public void initAdmin() {
         if (userRepository.findByUsername("admin").isEmpty()) {
@@ -69,7 +69,7 @@ public class UserController {
         return "admin";
     }
 
-    // Trang hiển thị thông tin user
+    
     @GetMapping("/user")
     public String userPage(Authentication authentication, Model model) {
         Users user = userRepository.findByUsername(authentication.getName())
@@ -78,7 +78,7 @@ public class UserController {
         return "user";
     }
 
-    // Trang chỉnh sửa thông tin user
+    
     @GetMapping("/user/edit")
     public String editUserPage(Authentication authentication, Model model) {
         Users user = userRepository.findByUsername(authentication.getName())
@@ -87,7 +87,7 @@ public class UserController {
         return "user_edit";
     }
 
-    // Xử lý cập nhật thông tin user
+    
     @PostMapping("/user/update")
     public String updatePersonalInfo(Authentication authentication, @ModelAttribute Users user) {
         Users currentUser = userRepository.findByUsername(authentication.getName())
@@ -99,7 +99,7 @@ public class UserController {
         return "redirect:/user";
     }
 
-    // Trang chỉnh sửa user trong admin
+    
     @GetMapping("/admin/edit/{id}")
     public String editUser(@PathVariable Long id, Model model) {
         Users user = userRepository.findById(id)
@@ -108,7 +108,7 @@ public class UserController {
         return "edit";
     }
 
-    // Xử lý cập nhật user trong admin
+    
     @PostMapping("/admin/update")
     public String updateUser(@ModelAttribute Users user) {
         Users existingUser = userRepository.findById(user.getId())
@@ -125,7 +125,7 @@ public class UserController {
         return "redirect:/admin";
     }
 
-    // Xóa user trong admin
+    
     @GetMapping("/admin/delete/{id}")
     public String deleteUser(@PathVariable Long id) {
         userRepository.deleteById(id);

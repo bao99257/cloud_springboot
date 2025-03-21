@@ -7,7 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "users") // Chỉ định tên bảng là "users"
+@Table(name = "users")
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +19,7 @@ public class Users {
     private int age;
     private String address;
 
-    // Constructors, getters, setters giống như trước
+   
     public Users() {}
 
     public Users(String username, String password, String role, String name, int age, String address) {
@@ -31,7 +31,7 @@ public class Users {
         this.address = address;
     }
 
-    // Getters and setters
+    
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getUsername() { return username; }
