@@ -20,8 +20,7 @@ public class JwtService {
 
     private static final String SECRET = "weroiuwroiweurieworuewioruewioruioewrewlkdsjflkjdsfkldsjfklsdf";
 
-    public String generateToken(String username) {
-        Map<String, Object> claims = new HashMap<>();
+    public String generateToken(String username, Map<String, Object> claims) {
         return createToken(claims, username);
     }
 

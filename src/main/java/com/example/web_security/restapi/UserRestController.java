@@ -13,7 +13,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.annotation.PostConstruct;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -53,12 +56,30 @@ public class UserRestController {
         return ResponseEntity.ok("User registered successfully");
     }
 
+    // @PostMapping("/generateToken")
+    // public ResponseEntity<String> generateToken(@RequestBody AuthRequest authRequest) {
+    //     Authentication authentication = authenticationManager.authenticate(
+    //             new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+    //     if (authentication.isAuthenticated()) {
+    //         return ResponseEntity.ok(jwtService.generateToken(authRequest.getUsername()));
+    //     } else {
+    //         throw new UsernameNotFoundException("Invalid credentials");
+    //     }
+    // }
     @PostMapping("/generateToken")
     public ResponseEntity<String> generateToken(@RequestBody AuthRequest authRequest) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+            new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+        
         if (authentication.isAuthenticated()) {
-            return ResponseEntity.ok(jwtService.generateToken(authRequest.getUsername()));
+            Users user = usersRepository.findByUsername(authRequest.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            
+            // Thêm claims với role
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("roles", user.getRole()); // Thêm dòng này
+            
+            return ResponseEntity.ok(jwtService.generateToken(authRequest.getUsername(), claims));
         } else {
             throw new UsernameNotFoundException("Invalid credentials");
         }
