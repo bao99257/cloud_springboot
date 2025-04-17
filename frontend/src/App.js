@@ -23,8 +23,8 @@ function App() {
       <CssBaseline />
       <BrowserRouter>
         <Routes>
+        <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
           <Route path="/profile" element={
             <PrivateRoute>
               <Profile />
@@ -36,6 +36,7 @@ function App() {
             </PrivateRoute>
           } />
           <Route path="/" element={
+            
             <PrivateRoute>
               <Profile />
             </PrivateRoute>

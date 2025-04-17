@@ -1,5 +1,4 @@
-package com.example.web_security.service;
-
+package com.example.web_security.Service;
 
 import com.example.web_security.Repo.UsersRepository;
 import com.example.web_security.model.Users;

@@ -21,67 +21,40 @@ function Login() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-
-
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    const response = await AuthService.login(form.username, form.password);
-    if (response.data) {
-      localStorage.setItem('token', response.data);
-      const decoded = jwtDecode(response.data);
-      
-      // Debug log
-      console.log('Login Decoded:', decoded);
+    try {
+      const response = await AuthService.login(form.username, form.password);
+      if (response.data) {
+        localStorage.setItem('token', response.data);
+        const decoded = jwtDecode(response.data);
 
-      // Điều hướng dựa trên role
-      const roles = Array.isArray(decoded.roles) 
-        ? decoded.roles 
-        : [decoded.roles].filter(Boolean);
+        console.log('Login Decoded:', decoded);
 
-      if (roles.includes('ROLE_ADMIN')) {
-        window.location.href = '/admin'; // Sử dụng window.location để đảm bảo reload
+        const roles = Array.isArray(decoded.roles) 
+          ? decoded.roles 
+          : [decoded.roles].filter(Boolean);
+
+        if (roles.includes('ROLE_ADMIN')) {
+          window.location.href = '/admin';
+        } else {
+          window.location.href = '/profile';
+        }
       } else {
-        window.location.href = '/profile';
+        setError('Tên đăng nhập hoặc mật khẩu không đúng');
       }
+    } catch (error) {
+      setError('Đăng nhập thất bại');
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    setError('Đăng nhập thất bại');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-  //   setError('');
-  
-  //   try {
-  //     const response = await AuthService.login(form.username, form.password);
-      
-  //     if (response.status === 200 && response.data) {
-  //       localStorage.setItem('token', response.data);
-  //       const decoded = jwtDecode(response.data);
-        
-  //       // Sửa cách kiểm tra role
-  //       if (decoded.roles && decoded.roles.includes('ROLE_ADMIN')) {
-  //         window.location.href = '/admin'; // Sử dụng window.location thay vì navigate
-  //       } else {
-  //         window.location.href = '/profile';
-  //       }
-  //     } else {
-  //       setError('Tên đăng nhập hoặc mật khẩu không đúng');
-  //     }
-  //   } catch (err) {
-  //     console.error('Login error:', err);
-  //     setError(err.response?.data?.message || 'Lỗi kết nối đến server');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const handleGoToRegister = () => {
+    navigate('/register');
+  };
 
   return (
     <Container maxWidth="sm">
@@ -116,6 +89,13 @@ function Login() {
             disabled={loading}
           >
             {loading ? <CircularProgress size={24} /> : 'Đăng nhập'}
+          </Button>
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={handleGoToRegister}
+          >
+            Chưa có tài khoản? Đăng ký
           </Button>
         </Box>
       </Box>
