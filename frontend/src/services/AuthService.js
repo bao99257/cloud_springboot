@@ -21,13 +21,11 @@ class AuthService {
         'Content-Type': 'application/json'
       },
       validateStatus: function (status) {
-        // Chấp nhận cả status 401 để xử lý
         return status === 200 || status === 401; 
       }
     }).catch(error => {
       console.error('AXIOS Error:', error);
       if (error.response) {
-        // Trả về response để xử lý trong component
         return error.response;
       }
       throw error;
@@ -48,6 +46,28 @@ class AuthService {
 
   getAllUsers() {
     return axios.get('/admin/users');
+  }
+
+  // 👇 Thêm API tạo người dùng (dành cho Admin)
+  createUser(userData) {
+    return axios.post('/admin/users/create', userData)
+      .catch(error => {
+        console.error('AXIOS Error:', error);
+        if (error.response) {
+          return error.response;
+        }
+        throw error;
+      });
+  }
+
+  // 👇 Cập nhật người dùng theo ID
+  updateUser(id, userData) {
+    return axios.put(`/admin/users/${id}`, userData);
+  }
+
+  // 👇 Xóa người dùng theo ID
+  deleteUser(id) {
+    return axios.delete(`/admin/users/${id}`);
   }
 }
 

@@ -1,27 +1,65 @@
 import React, { useEffect, useState } from 'react';
 import AuthService from '../../services/AuthService';
-import { 
-  Container, 
-  Typography, 
-  Box, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
+import {
+  Container,
+  Typography,
+  Box,  
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Paper,
-  Button
+  Button,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl
 } from '@mui/material';
+import { Edit, Delete } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 function AdminDashboard() {
   const [users, setUsers] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [formData, setFormData] = useState({
+    username: '',
+    name: '',
+    age: '',
+    address: '',
+    role: 'USER',
+    password: ''
+  });
+
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchUsers();
+    checkAdminStatus();
   }, []);
+
+  const checkAdminStatus = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        const roles = decoded.roles || [];
+        setIsAdmin(roles.includes('ROLE_ADMIN'));
+      } catch (error) {
+        console.error('Error decoding token:', error);
+      }
+    }
+  };
 
   const fetchUsers = async () => {
     try {
@@ -37,13 +75,62 @@ function AdminDashboard() {
     navigate('/login');
   };
 
+  const handleOpen = (user) => {
+    setEditingUser(user);
+    setFormData(user);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setEditingUser(null);
+  };
+
+  const handleChange = (e) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      // Cập nhật vai trò người dùng (chỉ admin mới có quyền cập nhật)
+      await AuthService.updateUser(editingUser.id, formData);
+      fetchUsers();
+      handleClose();
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Bạn có chắc muốn xóa người dùng này?')) {
+      try {
+        await AuthService.deleteUser(id);
+        fetchUsers();
+      } catch (error) {
+        console.error('Error deleting user:', error);
+      }
+    }
+  };
+
   return (
     <Container maxWidth="lg">
       <Box sx={{ display: 'flex', justifyContent: 'space-between', my: 4 }}>
         <Typography variant="h4">Quản lý người dùng (Admin)</Typography>
-        <Button variant="contained" color="error" onClick={handleLogout}>
-          Đăng xuất
-        </Button>
+        <Box>
+          {/* Chỉ hiển thị nút "Thêm người dùng" cho admin */}
+          {isAdmin && (
+            <Button variant="contained" sx={{ mr: 2 }} onClick={() => navigate('/create')}>
+              Thêm người dùng
+            </Button>
+          )}
+          <Button variant="contained" color="error" onClick={handleLogout}>
+            Đăng xuất
+          </Button>
+        </Box>
       </Box>
 
       <TableContainer component={Paper}>
@@ -56,6 +143,7 @@ function AdminDashboard() {
               <TableCell>Tuổi</TableCell>
               <TableCell>Địa chỉ</TableCell>
               <TableCell>Vai trò</TableCell>
+              <TableCell>Hành động</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -67,11 +155,89 @@ function AdminDashboard() {
                 <TableCell>{user.age}</TableCell>
                 <TableCell>{user.address}</TableCell>
                 <TableCell>{user.role}</TableCell>
+                <TableCell>
+                  {/* Chỉ hiển thị các hành động cho admin */}
+                  {isAdmin && (
+                    <>
+                      <IconButton color="primary" onClick={() => handleOpen(user)}>
+                        <Edit />
+                      </IconButton>
+                      <IconButton color="error" onClick={() => handleDelete(user.id)}>
+                        <Delete />
+                      </IconButton>
+                    </>
+                  )}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Dialog chỉ dùng để chỉnh sửa người dùng */}
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Sửa người dùng</DialogTitle>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+          <TextField
+            name="username"
+            label="Tên đăng nhập"
+            value={formData.username}
+            onChange={handleChange}
+            fullWidth
+            disabled
+          />
+          <TextField
+            name="password"
+            label="Mật Khẩu"
+            value={formData.password}
+            onChange={handleChange}
+            fullWidth
+          />
+          <TextField
+            name="name"
+            label="Họ tên"
+            value={formData.name}
+            onChange={handleChange}
+            fullWidth
+          />
+          <TextField
+            name="age"
+            label="Tuổi"
+            type="number"
+            value={formData.age}
+            onChange={handleChange}
+            fullWidth
+          />
+          <TextField
+            name="address"
+            label="Địa chỉ"
+            value={formData.address}
+            onChange={handleChange}
+            fullWidth
+          />
+          {/* Chỉ Admin mới có thể sửa vai trò */}
+          {isAdmin && (
+            <FormControl fullWidth>
+              <InputLabel id="role-select-label">Vai trò</InputLabel>
+              <Select
+                labelId="role-select-label"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+              >
+                <MenuItem value="ROLE_USER">USER</MenuItem>
+                <MenuItem value="ROLE_ADMIN">ADMIN</MenuItem>
+              </Select>
+            </FormControl>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Hủy</Button>
+          <Button onClick={handleSubmit} variant="contained">
+            Cập nhật
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }

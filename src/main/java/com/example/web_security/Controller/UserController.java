@@ -21,7 +21,6 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    
     @PostConstruct
     public void initAdmin() {
         if (userRepository.findByUsername("admin").isEmpty()) {
@@ -69,7 +68,6 @@ public class UserController {
         return "admin";
     }
 
-    
     @GetMapping("/user")
     public String userPage(Authentication authentication, Model model) {
         Users user = userRepository.findByUsername(authentication.getName())
@@ -78,7 +76,6 @@ public class UserController {
         return "user";
     }
 
-    
     @GetMapping("/user/edit")
     public String editUserPage(Authentication authentication, Model model) {
         Users user = userRepository.findByUsername(authentication.getName())
@@ -87,7 +84,6 @@ public class UserController {
         return "user_edit";
     }
 
-    
     @PostMapping("/user/update")
     public String updatePersonalInfo(Authentication authentication, @ModelAttribute Users user) {
         Users currentUser = userRepository.findByUsername(authentication.getName())
@@ -99,7 +95,6 @@ public class UserController {
         return "redirect:/user";
     }
 
-    
     @GetMapping("/admin/edit/{id}")
     public String editUser(@PathVariable Long id, Model model) {
         Users user = userRepository.findById(id)
@@ -108,7 +103,6 @@ public class UserController {
         return "edit";
     }
 
-    
     @PostMapping("/admin/update")
     public String updateUser(@ModelAttribute Users user) {
         Users existingUser = userRepository.findById(user.getId())
@@ -125,10 +119,45 @@ public class UserController {
         return "redirect:/admin";
     }
 
-    
     @GetMapping("/admin/delete/{id}")
     public String deleteUser(@PathVariable Long id) {
         userRepository.deleteById(id);
         return "redirect:/admin";
     }
+
+    // Thêm vào controller để hiển thị form tạo user mới
+    @GetMapping("/admin/create")
+    public String showCreateUserForm(Model model) {
+        model.addAttribute("user", new Users());
+        return "create_user"; // Tạo trang HTML cho form tạo user mới
+    }
+
+    // Xử lý việc tạo user mới
+    @PostMapping("/admin/create")
+    public String createUser(@ModelAttribute Users user) {
+        user.setRole("ROLE_USER"); // Vai trò mặc định cho user mới
+        user.setPassword(passwordEncoder.encode(user.getPassword())); // Mã hóa mật khẩu
+        userRepository.save(user); // Lưu người dùng mới vào database
+        return "redirect:/admin"; // Chuyển hướng về trang admin sau khi tạo user
+    }
+
+    // Thêm route sửa role của user
+    @GetMapping("/admin/editRole/{id}")
+    public String editUserRoleForm(@PathVariable Long id, Model model) {
+        Users user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        model.addAttribute("user", user);
+        return "edit_role"; // Tạo trang HTML cho việc sửa role của user
+    }
+
+    // Xử lý cập nhật role cho user
+    @PostMapping("/admin/updateRole")
+    public String updateUserRole(@RequestParam Long id, @RequestParam String role) {
+        Users user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setRole(role);
+        userRepository.save(user); // Lưu lại role mới cho user
+        return "redirect:/admin"; // Quay lại trang admin sau khi cập nhật role
+    }
+
 }

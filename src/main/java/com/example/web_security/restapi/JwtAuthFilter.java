@@ -1,7 +1,5 @@
 package com.example.web_security.restapi;
 
-
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,9 +26,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     // Danh sách các endpoint không cần kiểm tra token
     private static final String[] PUBLIC_ENDPOINTS = {
-        "/api/register",
-        "/api/generateToken",
-        "/api/welcome"
+            "/api/register",
+            "/api/generateToken",
+            "/api/welcome"
     };
 
     @Override

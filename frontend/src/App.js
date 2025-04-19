@@ -3,6 +3,7 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Profile from './components/Profile';
 import AdminDashboard from './components/Admin/AdminDashboard';
+import CreateUserPage from './components/Admin/CreateUser'; // Assuming this component exists
 import PrivateRoute from './components/PrivateRoute';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 
@@ -23,7 +24,7 @@ function App() {
       <CssBaseline />
       <BrowserRouter>
         <Routes>
-        <Route path="/register" element={<Register />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={
             <PrivateRoute>
@@ -35,8 +36,12 @@ function App() {
               <AdminDashboard />
             </PrivateRoute>
           } />
+          <Route path="/create" element={
+            <PrivateRoute adminOnly>
+              <CreateUserPage />
+            </PrivateRoute>
+          } />
           <Route path="/" element={
-            
             <PrivateRoute>
               <Profile />
             </PrivateRoute>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Role</title>
+</head>
+<body>
+    <h2>Edit User Role</h2>
+    <form th:action="@{/admin/updateRole}" method="post">
+        <!-- CSRF token -->
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+        <!-- Hidden user ID -->
+        <input type="hidden" th:name="id" th:value="${user.id}" />
+
+        <label>Username:</label>
+        <input type="text" th:value="${user.username}" disabled />
+
+        <label>Role:</label>
+        <select name="role">
+            <option value="ROLE_USER" th:selected="${user.role == 'ROLE_USER'}">ROLE_USER</option>
+            <option value="ROLE_ADMIN" th:selected="${user.role == 'ROLE_ADMIN'}">ROLE_ADMIN</option>
+        </select>
+
+        <button type="submit">Update Role</button>
+    </form>
+</body>
+</html>
