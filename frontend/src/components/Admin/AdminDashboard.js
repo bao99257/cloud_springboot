@@ -77,9 +77,11 @@ function AdminDashboard() {
 
   const handleOpen = (user) => {
     setEditingUser(user);
-    setFormData(user);
+    // Xóa mật khẩu khỏi form hiển thị
+    setFormData({ ...user, password: '' });
     setOpen(true);
   };
+  
 
   const handleClose = () => {
     setOpen(false);
@@ -96,14 +98,21 @@ function AdminDashboard() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Cập nhật vai trò người dùng (chỉ admin mới có quyền cập nhật)
-      await AuthService.updateUser(editingUser.id, formData);
+      const updatedData = { ...formData };
+  
+      // Nếu password để trống, không gửi lên
+      if (!updatedData.password || updatedData.password.trim() === '') {
+        delete updatedData.password;
+      }
+  
+      await AuthService.updateUser(editingUser.id, updatedData);
       fetchUsers();
       handleClose();
     } catch (error) {
       console.error('Error updating user:', error);
     }
   };
+  
 
   const handleDelete = async (id) => {
     if (window.confirm('Bạn có chắc muốn xóa người dùng này?')) {
