@@ -3,7 +3,7 @@ import AuthService from '../../services/AuthService';
 import {
   Container,
   Typography,
-  Box,  
+  Box,
   Table,
   TableBody,
   TableCell,
@@ -81,7 +81,6 @@ function AdminDashboard() {
     setFormData({ ...user, password: '' });
     setOpen(true);
   };
-  
 
   const handleClose = () => {
     setOpen(false);
@@ -112,7 +111,6 @@ function AdminDashboard() {
       console.error('Error updating user:', error);
     }
   };
-  
 
   const handleDelete = async (id) => {
     if (window.confirm('Bạn có chắc muốn xóa người dùng này?')) {
@@ -126,17 +124,28 @@ function AdminDashboard() {
   };
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', my: 4 }}>
-        <Typography variant="h4">Quản lý người dùng (Admin)</Typography>
+    <Container maxWidth="lg" sx={{ mt: 6 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
+        <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#37474F' }}>
+          Quản lý người dùng (Admin)
+        </Typography>
         <Box>
           {/* Chỉ hiển thị nút "Thêm người dùng" cho admin */}
           {isAdmin && (
-            <Button variant="contained" sx={{ mr: 2 }} onClick={() => navigate('/create')}>
+            <Button 
+              variant="contained" 
+              sx={{ mr: 2, backgroundColor: '#FF7043', '&:hover': { backgroundColor: '#FF5722' } }}
+              onClick={() => navigate('/create')}
+            >
               Thêm người dùng
             </Button>
           )}
-          <Button variant="contained" color="error" onClick={handleLogout}>
+          <Button 
+            variant="contained" 
+            color="error" 
+            sx={{ backgroundColor: '#E53935', '&:hover': { backgroundColor: '#D32F2F' } }}
+            onClick={handleLogout}
+          >
             Đăng xuất
           </Button>
         </Box>
@@ -144,15 +153,15 @@ function AdminDashboard() {
 
       <TableContainer component={Paper}>
         <Table>
-          <TableHead>
+          <TableHead sx={{ backgroundColor: '#ECEFF1' }}>
             <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Tên đăng nhập</TableCell>
-              <TableCell>Họ tên</TableCell>
-              <TableCell>Tuổi</TableCell>
-              <TableCell>Địa chỉ</TableCell>
-              <TableCell>Vai trò</TableCell>
-              <TableCell>Hành động</TableCell>
+              <TableCell><strong>ID</strong></TableCell>
+              <TableCell><strong>Tên đăng nhập</strong></TableCell>
+              <TableCell><strong>Họ tên</strong></TableCell>
+              <TableCell><strong>Tuổi</strong></TableCell>
+              <TableCell><strong>Địa chỉ</strong></TableCell>
+              <TableCell><strong>Vai trò</strong></TableCell>
+              <TableCell><strong>Hành động</strong></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -168,10 +177,18 @@ function AdminDashboard() {
                   {/* Chỉ hiển thị các hành động cho admin */}
                   {isAdmin && (
                     <>
-                      <IconButton color="primary" onClick={() => handleOpen(user)}>
+                      <IconButton 
+                        color="primary" 
+                        onClick={() => handleOpen(user)}
+                        sx={{ '&:hover': { backgroundColor: '#E3F2FD' } }}
+                      >
                         <Edit />
                       </IconButton>
-                      <IconButton color="error" onClick={() => handleDelete(user.id)}>
+                      <IconButton 
+                        color="error" 
+                        onClick={() => handleDelete(user.id)}
+                        sx={{ '&:hover': { backgroundColor: '#FFEBEE' } }}
+                      >
                         <Delete />
                       </IconButton>
                     </>
@@ -242,7 +259,7 @@ function AdminDashboard() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Hủy</Button>
-          <Button onClick={handleSubmit} variant="contained">
+          <Button onClick={handleSubmit} variant="contained" color="primary">
             Cập nhật
           </Button>
         </DialogActions>
