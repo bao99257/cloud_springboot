@@ -11,7 +11,7 @@ function AdminTableList() {
   const [editingTable, setEditingTable] = useState(null);
   const [formData, setFormData] = useState({
     number: '',
-    description: '',
+    notes: '',
     status: false // Renaming from isReserved to status
   });
   const [isAdmin, setIsAdmin] = useState(false);
@@ -162,7 +162,7 @@ function AdminTableList() {
             fullWidth
           />
           <TextField
-            name="description"
+            name="notes"
             label="Notes"
             value={formData.notes}
             onChange={handleChange}
