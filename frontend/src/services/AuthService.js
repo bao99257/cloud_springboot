@@ -82,6 +82,17 @@ class AuthService {
     return axios.post('/admin/home/tables/create', data)  // Cập nhật lại endpoint để tạo bàn
    
   }
+// Create user (Admin only)
+createUser(userData) {
+  return axios.post('/admin/home/users/create', userData)
+    .catch(error => {
+      console.error('AXIOS Error creating user:', error);
+      if (error.response) {
+        return error.response;
+      }
+      throw error;
+    });
+}
 
   // Update user by ID (Admin only)
   updateUser(id, userData) {
