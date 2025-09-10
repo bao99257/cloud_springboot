@@ -1,2 +1,25 @@
- docker-compose build
- docker-compose up -d
+# === CÁC LỆNH CƠ BẢN ===
+docker-compose down                        # Dừng và xóa các container đang chạy
+docker-compose build                       # Build lại các images
+docker-compose up                          # Khởi động tất cả container
+docker-compose up -d                       # Chạy container ở chế độ nền (detached)
+
+# === XÓA SẠCH VÀ BUILD LẠI TỪ ĐẦU ===
+docker-compose down --volumes --rmi all    # Xóa hết container, volume và images
+docker system prune -a                     # Dọn sạch cache và images không dùng
+docker-compose build --no-cache            # Build lại images mới hoàn toàn
+docker-compose up                          # Khởi động lại tất cả container
+
+# === KIỂM TRA TRẠNG THÁI ===
+docker ps                                  # Xem các container đang chạy
+docker-compose ps                          # Xem trạng thái các container trong docker-compose
+docker logs [tên_container]                # Xem log của container
+
+# === BUILD VÀ CHẠY TỪNG CONTAINER ===
+docker-compose build mysql react-app       # Build riêng container cụ thể
+docker-compose up mysql react-app          # Chạy riêng container cụ thể
+
+# === LƯU Ý ===
+# - MySQL không cần build vì dùng image có sẵn từ Docker Hub
+# - Chỉ spring-boot-app và react-app cần build vì có Dockerfile riêng
+# - Luôn chạy lệnh trong thư mục chứa file docker-compose.yml

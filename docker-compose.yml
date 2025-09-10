@@ -11,6 +11,9 @@ services:
       MYSQL_DATABASE: testflutter
     volumes:
       - mysql-data:/var/lib/mysql
+      #Lưu trữ dữ liệu
+       #Được persist qua volume:
+       #volumes:- mysql-data:/var/lib/mysql
 
   spring-boot-app:
     build:

@@ -1,7 +1,7 @@
 import axios from './axiosConfig';
 
 class AuthService {
-  // Register user (for general users)
+  // 1. Đăng ký người dùng mới
   register(username, password, name, age, address) {
     return axios.post('/register', {
       username,
@@ -9,7 +9,7 @@ class AuthService {
       name,
       age,
       address,
-      role: 'ROLE_USER'
+      role: 'ROLE_USER'  // Mặc định role là user
     }).catch(error => {
       console.error('AXIOS Error during register:', error);
       if (error.response) {
@@ -19,7 +19,7 @@ class AuthService {
     });
   }
 
-  // Login (for both Admin and User)
+  // 2. Đăng nhập (cho cả Admin và User)
   login(username, password) {
     return axios.post('/generateToken', {
       username,
@@ -29,7 +29,7 @@ class AuthService {
         'Content-Type': 'application/json'
       },
       validateStatus: function (status) {
-        return status === 200 || status === 401; 
+        return status === 200 || status === 401; // Chấp nhận cả status thành công và unauthorized
       }
     }).catch(error => {
       console.error('AXIOS Error during login:', error);
@@ -40,143 +40,72 @@ class AuthService {
     });
   }
 
-  // Fetch the user's profile
+  // 3. Các chức năng cho User thường
+  // 3.1 Lấy thông tin profile
   getProfile() {
-    return axios.get('/user/home/profile').catch(error => {
-      console.error('AXIOS Error fetching profile:', error);
-      if (error.response) {
-        return error.response;
-      }
-      throw error;
-    });
+    return axios.get('/user/home/profile');
   }
 
-  // Update the user's profile
+  // 3.2 Cập nhật profile
   updateProfile(name, age, address) {
     return axios.put('/user/home/update', {
       name,
       age,
       address
-    }).catch(error => {
-      console.error('AXIOS Error updating profile:', error);
-      if (error.response) {
-        return error.response;
-      }
-      throw error;
     });
   }
 
-  // Fetch all users (Admin only)
+  // 3.3 Lấy danh sách bàn cho user
+  getAllTablesForUser() {
+    return axios.get('/user/home/tables/all');
+  }
+
+  // 3.4 Đặt bàn
+  reserveTable(id, data) {
+    return axios.put(`/user/home/tables/${id}/reserve`, data);
+  }
+
+  // 4. Các chức năng cho Admin
+  // 4.1 Lấy danh sách tất cả users
   getAllUsers() {
-    return axios.get('/admin/home/users').catch(error => {
-      console.error('AXIOS Error fetching all users:', error);
-      if (error.response) {
-        return error.response;
-      }
-      throw error;
-    });
+    return axios.get('/admin/home/users');
   }
 
-  // Create a new table (Admin only)
-  createTable(data) {
-    return axios.post('/admin/home/tables/create', data)  // Cập nhật lại endpoint để tạo bàn
-   
+  // 4.2 Tạo user mới
+  createUser(userData) {
+    return axios.post('/admin/home/users/create', userData);
   }
-// Create user (Admin only)
-createUser(userData) {
-  return axios.post('/admin/home/users/create', userData)
-    .catch(error => {
-      console.error('AXIOS Error creating user:', error);
-      if (error.response) {
-        return error.response;
-      }
-      throw error;
-    });
-}
 
-  // Update user by ID (Admin only)
+  // 4.3 Cập nhật thông tin user
   updateUser(id, userData) {
-    return axios.put(`/admin/home/users/${id}`, userData)
-      .catch(error => {
-        console.error('AXIOS Error updating user:', error);
-        if (error.response) {
-          return error.response;
-        }
-        throw error;
-      });
+    return axios.put(`/admin/home/users/${id}`, userData);
   }
 
-  // Delete user by ID (Admin only)
+  // 4.4 Xóa user
   deleteUser(id) {
-    return axios.delete(`/admin/home/users/${id}`)
-      .catch(error => {
-        console.error('AXIOS Error deleting user:', error);
-        if (error.response) {
-          return error.response;
-        }
-        throw error;
-      });
+    return axios.delete(`/admin/home/users/${id}`);
   }
 
-  // Fetch all tables (Admin only)
+  // 4.5 Quản lý bàn
   getAllTables() {
-    return axios.get('/admin/home/tables/all').catch(error => {
-      console.error('AXIOS Error fetching all tables:', error);
-      if (error.response) {
-        return error.response;
-      }
-      throw error;
-    });
+    return axios.get('/admin/home/tables/all');
   }
 
-  // Update a table by ID (Admin only)
+  createTable(data) {
+    return axios.post('/admin/home/tables/create', data);
+  }
+
   updateTable(id, tableData) {
-    // Convert boolean-like status to readable string
     const convertedData = {
       ...tableData,
       status: tableData.status === true || tableData.status === 'true' ? 'Đã đặt' : 'Chưa đặt'
     };
-  
-    return axios.put(`/admin/home/tables/${id}/update`, convertedData)
-      .catch(error => {
-        console.error('AXIOS Error updating table:', error);
-        if (error.response) {
-          return error.response;
-        }
-        throw error;
-      });
+    return axios.put(`/admin/home/tables/${id}/update`, convertedData);
   }
 
-  // Delete a table by ID (Admin only)
   deleteTable(id) {
-    return axios.delete(`/admin/home/tables/${id}/delete`)
-      .catch(error => {
-        console.error('AXIOS Error deleting table:', error);
-        if (error.response) {
-          return error.response;
-        }
-        throw error;
-      });
+    return axios.delete(`/admin/home/tables/${id}/delete`);
   }
-  // Lấy danh sách bàn cho người dùng
-// Lấy danh sách bàn cho người dùng
-getAllTablesForUser() {
-  return axios.get('/user/home/tables/all').catch(error => {
-    console.error('AXIOS Error fetching user tables:', error);
-    if (error.response) {
-      return error.response;
-    }
-    throw error;
-  });
-}
-
-
-// Đặt bàn (user)
-reserveTable(id, data) {
-  return axios.put(`/user/home/tables/${id}/reserve`, data);
-}
-
-
 }
 
 const authServiceInstance = new AuthService();
