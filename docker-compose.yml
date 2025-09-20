@@ -1,33 +1,31 @@
 version: '3'
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: mysql
+  postgres:
+    image: postgres:15
+    container_name: postgres
     restart: always
     ports:
-      - "3306:3306"
+      - "5432:5432"
     environment:
-      MYSQL_ROOT_PASSWORD: vtat2011
-      MYSQL_DATABASE: testflutter
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: vtat2011
+      POSTGRES_DB: testflutter
     volumes:
-      - mysql-data:/var/lib/mysql
-      #Lưu trữ dữ liệu
-       #Được persist qua volume:
-       #volumes:- mysql-data:/var/lib/mysql
+      - postgres-data:/var/lib/postgresql/data
 
   spring-boot-app:
     build:
-      context: .                 # trỏ tới thư mục gốc (nơi có file docker-compose.yml)
-      dockerfile: ./src/Dockerfile  # trỏ đến Dockerfile thực tế của bạn
+      context: .
+      dockerfile: Dockerfile
+    container_name: spring-boot-app
     ports:
       - "8080:8080"
     depends_on:
-      - mysql
+      - postgres
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/testflutter
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/testflutter
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: vtat2011
-
 
   react-app:
     build:
@@ -39,4 +37,4 @@ services:
       - "3000:80"
 
 volumes:
-  mysql-data:
+  postgres-data:
