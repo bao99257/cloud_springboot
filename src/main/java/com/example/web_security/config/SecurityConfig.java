@@ -99,6 +99,7 @@ public class SecurityConfig {
         }
 
         // SecurityFilterChain cho các endpoint còn lại (dùng form login)
+        // SecurityFilterChain cho các endpoint còn lại (dùng form login)
         @Bean
         @Order(2)
         public SecurityFilterChain formLoginFilterChain(HttpSecurity http) throws Exception {
@@ -108,31 +109,34 @@ public class SecurityConfig {
                                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                                 // User có quyền truy cập vào các đường dẫn /user/**
                                                 .requestMatchers("/user/**").hasRole("USER")
-                                                // Các trang đăng nhập, đăng ký, và H2 Console không yêu cầu xác thực
+                                                // Các trang login, register, H2 console không yêu cầu xác thực
                                                 .requestMatchers("/login", "/register", "/h2-console/**").permitAll()
-                                                // Các yêu cầu khác yêu cầu người dùng phải xác thực
+                                                // Các yêu cầu khác yêu cầu xác thực
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
-                                                // Trang login tùy chỉnh
                                                 .loginPage("/login")
-                                                // Sau khi đăng nhập thành công, chuyển hướng về trang /home
-                                                .defaultSuccessUrl("/home", true)
-                                                // Cho phép truy cập không yêu cầu xác thực cho trang đăng nhập
+                                                .successHandler((request, response, authentication) -> {
+                                                        // check role
+                                                        var authorities = authentication.getAuthorities();
+                                                        if (authorities.stream().anyMatch(
+                                                                        a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+                                                                response.sendRedirect("/admin");
+                                                        } else {
+                                                                response.sendRedirect("/shop");
+                                                        }
+                                                })
                                                 .permitAll())
+
                                 .logout(logout -> logout
-                                                .logoutUrl("/logout") // URL logout
-                                                .logoutSuccessUrl("/login") // URL chuyển hướng sau khi logout thành
-                                                // công
-                                                .permitAll() // Cho phép logout mà không yêu cầu xác thực
-                                                .invalidateHttpSession(true) // Hủy bỏ session khi logout
-                                                .deleteCookies("JSESSIONID")) // Xóa cookie phiên
-                                .csrf(csrf -> csrf
-                                                // Bỏ qua CSRF cho H2 Console (nếu sử dụng H2 console)
-                                                .ignoringRequestMatchers("/h2-console/**"))
-                                .headers(headers -> headers
-                                                // Cấu hình bảo mật để cho phép iframe từ cùng một nguồn
-                                                .frameOptions(frameOptions -> frameOptions.sameOrigin()));
+                                                .logoutUrl("/logout")
+                                                .logoutSuccessUrl("/login")
+                                                .permitAll()
+                                                .invalidateHttpSession(true)
+                                                .deleteCookies("JSESSIONID"))
+                                .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
+                                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
                 return http.build();
         }
+
 }
