@@ -26,17 +26,19 @@ pipeline {
             }
         }
 
-        stage('Build Docker Images') {
-            steps {
-                echo "🐳 Building Docker images..."
-                script {
-                    // Build backend (Dockerfile ở thư mục backend)
-                    sh "docker build -t ${BACKEND_IMAGE}:latest ./backend"
-                    // Build frontend (Dockerfile ở thư mục frontend)
-                    sh "docker build -t ${FRONTEND_IMAGE}:latest ./frontend"
-                }
-            }
+      stage('Build Docker Images') {
+    steps {
+        echo "🐳 Building Docker images..."
+        script {
+            // Build backend (Dockerfile ở gốc repo)
+            sh "docker build -t ${BACKEND_IMAGE}:latest ."
+
+            // Build frontend (Dockerfile trong thư mục frontend)
+            sh "docker build -t ${FRONTEND_IMAGE}:latest ./frontend"
         }
+    }
+}
+
 
         stage('Push to DockerHub') {
             steps {
