@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USER = 'leanhbao'          // 👈 thay bằng tên DockerHub thật
-        DOCKERHUB_CREDENTIALS = 'dockerhub-cred '            // 👈 ID credentials Jenkins (DockerHub)
+        DOCKERHUB_USER = 'leanhbao'                    // 👈 Tên tài khoản DockerHub thật
+        DOCKERHUB_CREDENTIALS = 'dockerhub-cred'       // 👈 ID credentials trong Jenkins (không có khoảng trắng)
         BACKEND_IMAGE = "${DOCKERHUB_USER}/backend"
         FRONTEND_IMAGE = "${DOCKERHUB_USER}/frontend"
         DEPLOY_PATH = "/opt/deploy/app"
@@ -14,16 +14,16 @@ pipeline {
         stage('Checkout Source') {
             steps {
                 echo "📦 Cloning repository..."
-                git branch: 'main', url: 'https://github.com/bao99257/cloud_springboot.git' // 👈 sửa lại repo của bạn
+                git branch: 'main', url: 'https://github.com/bao99257/cloud_springboot.git'
             }
         }
 
         stage('Build Backend') {
             steps {
                 echo "🧱 Building Spring Boot backend..."
-                dir('backend') {
-                    sh './mvnw clean package -DskipTests || mvn clean package -DskipTests'
-                }
+                // Không cần cd vào backend vì pom.xml ở gốc repo
+                sh 'chmod +x mvnw || true'
+                sh './mvnw clean package -DskipTests || mvn clean package -DskipTests'
             }
         }
 
@@ -31,7 +31,9 @@ pipeline {
             steps {
                 echo "🐳 Building Docker images..."
                 script {
-                    sh "docker build -t ${BACKEND_IMAGE}:latest ./backend"
+                    // Build backend image từ Dockerfile ở gốc repo
+                    sh "docker build -t ${BACKEND_IMAGE}:latest -f Dockerfile ."
+                    // Build frontend image từ Dockerfile trong thư mục frontend
                     sh "docker build -t ${FRONTEND_IMAGE}:latest ./frontend"
                 }
             }
