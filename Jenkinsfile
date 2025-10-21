@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USER = 'leanhbao'                    // 👈 Tên tài khoản DockerHub thật
-        DOCKERHUB_CREDENTIALS = 'dockerhub-cred'       // 👈 ID credentials trong Jenkins (không có khoảng trắng)
+        DOCKERHUB_USER = 'leanhbao'                    // 👈 Tài khoản DockerHub thật
+        DOCKERHUB_CREDENTIALS = 'dockerhub-cred'       // 👈 ID credentials trong Jenkins
         BACKEND_IMAGE = "${DOCKERHUB_USER}/backend"
         FRONTEND_IMAGE = "${DOCKERHUB_USER}/frontend"
         DEPLOY_PATH = "/opt/deploy/app"
@@ -21,9 +21,8 @@ pipeline {
         stage('Build Backend') {
             steps {
                 echo "🧱 Building Spring Boot backend..."
-                // Không cần cd vào backend vì pom.xml ở gốc repo
-                sh 'chmod +x mvnw || true'
-                sh './mvnw clean package -DskipTests || mvn clean package -DskipTests'
+                // ❗ Dùng Maven hệ thống, không dùng mvnw wrapper
+                sh 'mvn clean package -DskipTests'
             }
         }
 
@@ -31,9 +30,9 @@ pipeline {
             steps {
                 echo "🐳 Building Docker images..."
                 script {
-                    // Build backend image từ Dockerfile ở gốc repo
-                    sh "docker build -t ${BACKEND_IMAGE}:latest -f Dockerfile ."
-                    // Build frontend image từ Dockerfile trong thư mục frontend
+                    // Build backend (Dockerfile ở thư mục backend)
+                    sh "docker build -t ${BACKEND_IMAGE}:latest ./backend"
+                    // Build frontend (Dockerfile ở thư mục frontend)
                     sh "docker build -t ${FRONTEND_IMAGE}:latest ./frontend"
                 }
             }
@@ -43,9 +42,11 @@ pipeline {
             steps {
                 echo "📤 Pushing images to DockerHub..."
                 withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS}", usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    sh "echo $PASS | docker login -u $USER --password-stdin"
-                    sh "docker push ${BACKEND_IMAGE}:latest"
-                    sh "docker push ${FRONTEND_IMAGE}:latest"
+                    sh """
+                    echo $PASS | docker login -u $USER --password-stdin
+                    docker push ${BACKEND_IMAGE}:latest
+                    docker push ${FRONTEND_IMAGE}:latest
+                    """
                 }
             }
         }
@@ -55,7 +56,7 @@ pipeline {
                 echo "🚀 Deploying to production..."
                 sh """
                 cd ${DEPLOY_PATH}
-                docker compose down
+                docker compose down || true
                 docker compose pull
                 docker compose up -d
                 """
