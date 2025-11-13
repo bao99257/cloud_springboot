@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -45,8 +46,15 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0) translateX(0); }
-            50% { transform: translateY(-30px) translateX(30px); }
+
+            0%,
+            100% {
+                transform: translateY(0) translateX(0);
+            }
+
+            50% {
+                transform: translateY(-30px) translateX(30px);
+            }
         }
 
         .container {
@@ -284,9 +292,17 @@
 
         /* Input focus animations */
         @keyframes inputFocus {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.02);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
         .form-control:focus {
@@ -309,13 +325,14 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="form-card">
             <div class="header-section">
                 <div class="icon-wrapper">
                     <svg viewBox="0 0 24 24">
-                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                     </svg>
                 </div>
                 <h2>Create New Product</h2>
@@ -327,14 +344,11 @@
                     <label for="name">Product Name</label>
                     <div class="input-wrapper">
                         <svg class="input-icon" viewBox="0 0 24 24">
-                            <path d="M20 7h-9M14 17H5M16 7a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM8 17a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                            <path
+                                d="M20 7h-9M14 17H5M16 7a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM8 17a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
                         </svg>
-                        <input type="text" 
-                               id="name" 
-                               name="name" 
-                               class="form-control has-icon" 
-                               placeholder="Enter product name"
-                               required/>
+                        <input type="text" id="name" name="name" class="form-control has-icon"
+                            placeholder="Enter product name" required />
                     </div>
                 </div>
 
@@ -342,47 +356,35 @@
                     <label for="price">Price</label>
                     <div class="input-wrapper">
                         <svg class="input-icon" viewBox="0 0 24 24">
-                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                         </svg>
-                        <input type="number" 
-                               id="price"
-                               step="0.01" 
-                               name="price" 
-                               class="form-control has-icon" 
-                               placeholder="0.00"
-                               required/>
+                        <input type="number" id="price" step="0.01" name="price" class="form-control has-icon"
+                            placeholder="0.00" required />
                     </div>
                 </div>
 
                 <div class="mb-3">
                     <label for="description">Description</label>
                     <div class="input-wrapper">
-                        <textarea id="description"
-                                  name="description" 
-                                  class="form-control" 
-                                  placeholder="Enter product description..."
-                                  required></textarea>
+                        <textarea id="description" name="description" class="form-control"
+                            placeholder="Enter product description..." required></textarea>
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label>Product Image</label>
-                    <div class="file-input-wrapper" id="fileInputWrapper">
-                        <svg class="file-icon" viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <path d="M21 15l-5-5L5 21"/>
+                    <label for="imageUrl">Product Image URL</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" viewBox="0 0 24 24">
+                            <path d="M21 15l-5-5L5 21M3 3h18v18H3V3zm5.5 7a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z" />
                         </svg>
-                        <div class="file-text">Click to upload or drag and drop</div>
-                        <div class="file-hint">PNG, JPG, GIF up to 10MB</div>
-                        <div id="fileName" class="file-name" style="display: none;"></div>
-                        <input type="file" 
-                               name="imageFile" 
-                               id="imageFile"
-                               accept="image/*"
-                               required/>
+
+                        <input type="text" id="imageUrl" name="imageUrl" class="form-control has-icon"
+                            placeholder="Paste image URL here (e.g. https://...)" required />
                     </div>
+
+                    <small style="color:#888;">Enter a direct image link (JPG, PNG, GIF)</small>
                 </div>
+
 
                 <div class="btn-group">
                     <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
@@ -398,7 +400,7 @@
         const fileInputWrapper = document.getElementById('fileInputWrapper');
         const fileNameDisplay = document.getElementById('fileName');
 
-        fileInput.addEventListener('change', function(e) {
+        fileInput.addEventListener('change', function (e) {
             if (e.target.files.length > 0) {
                 const fileName = e.target.files[0].name;
                 fileNameDisplay.textContent = fileName;
@@ -407,20 +409,20 @@
         });
 
         // Drag and drop functionality
-        fileInputWrapper.addEventListener('dragover', function(e) {
+        fileInputWrapper.addEventListener('dragover', function (e) {
             e.preventDefault();
             fileInputWrapper.classList.add('dragover');
         });
 
-        fileInputWrapper.addEventListener('dragleave', function(e) {
+        fileInputWrapper.addEventListener('dragleave', function (e) {
             e.preventDefault();
             fileInputWrapper.classList.remove('dragover');
         });
 
-        fileInputWrapper.addEventListener('drop', function(e) {
+        fileInputWrapper.addEventListener('drop', function (e) {
             e.preventDefault();
             fileInputWrapper.classList.remove('dragover');
-            
+
             const files = e.dataTransfer.files;
             if (files.length > 0) {
                 fileInput.files = files;
@@ -431,4 +433,5 @@
         });
     </script>
 </body>
+
 </html>

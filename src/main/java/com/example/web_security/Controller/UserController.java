@@ -164,6 +164,7 @@ public class UserController {
     }
 
     // ------------------- CRUD PRODUCT (Admin) -------------------
+
     @GetMapping("/admin/products/create")
     public String showCreateProductForm(Model model) {
         model.addAttribute("product", new Product());
@@ -171,25 +172,11 @@ public class UserController {
     }
 
     @PostMapping("/admin/products/create")
-    public String createProduct(@ModelAttribute Product product,
-            @RequestParam("imageFile") MultipartFile imageFile) throws IOException {
-        if (!imageFile.isEmpty()) {
-            // Nơi lưu ảnh: src/main/resources/static/images/
-            // String uploadDir = "src/main/resources/static/images/";
-            String uploadDir = "/opt/render/project/src/uploads/images/";
-            Files.createDirectories(Paths.get(uploadDir));
+    public String createProduct(@ModelAttribute Product product) {
 
-            // Tạo tên file duy nhất
-            String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
-            Path path = Paths.get(uploadDir, fileName);
-            Files.write(path, imageFile.getBytes());
-
-            // Lưu đường dẫn để hiển thị
-            product.setImageUrl("/uploads/images/" + fileName);
-
-        }
-
+        // KHÔNG upload file nữa, chỉ lưu imageUrl do user nhập
         productRepository.save(product);
+
         return "redirect:/admin";
     }
 
@@ -203,15 +190,17 @@ public class UserController {
 
     @PostMapping("/admin/products/update")
     public String updateProduct(@ModelAttribute Product product) {
+
         Product existingProduct = productRepository.findById(product.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
         existingProduct.setName(product.getName());
         existingProduct.setPrice(product.getPrice());
-        existingProduct.setImageUrl(product.getImageUrl());
         existingProduct.setDescription(product.getDescription());
+        existingProduct.setImageUrl(product.getImageUrl()); // giữ URL
 
         productRepository.save(existingProduct);
+
         return "redirect:/admin";
     }
 
