@@ -175,16 +175,18 @@ public class UserController {
             @RequestParam("imageFile") MultipartFile imageFile) throws IOException {
         if (!imageFile.isEmpty()) {
             // Nơi lưu ảnh: src/main/resources/static/images/
-            String uploadDir = "src/main/resources/static/images/";
+            // String uploadDir = "src/main/resources/static/images/";
+            String uploadDir = "/opt/render/project/src/uploads/images/";
+            Files.createDirectories(Paths.get(uploadDir));
 
             // Tạo tên file duy nhất
-            String fileName = UUID.randomUUID().toString() + "_" + imageFile.getOriginalFilename();
-
-            Path path = Paths.get(uploadDir + fileName);
+            String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+            Path path = Paths.get(uploadDir, fileName);
             Files.write(path, imageFile.getBytes());
 
             // Lưu đường dẫn để hiển thị
-            product.setImageUrl("/images/" + fileName);
+            product.setImageUrl("/uploads/images/" + fileName);
+
         }
 
         productRepository.save(product);
