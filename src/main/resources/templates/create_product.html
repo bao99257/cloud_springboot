@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Product</title>
+
     <style>
         * {
             margin: 0;
@@ -17,7 +18,6 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 40px 20px;
-            position: relative;
             overflow-x: hidden;
         }
 
@@ -30,7 +30,6 @@
             top: -200px;
             right: -200px;
             animation: float 8s ease-in-out infinite;
-            pointer-events: none;
         }
 
         body::after {
@@ -42,26 +41,17 @@
             bottom: -150px;
             left: -150px;
             animation: float 10s ease-in-out infinite reverse;
-            pointer-events: none;
         }
 
         @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0) translateX(0);
-            }
-
-            50% {
-                transform: translateY(-30px) translateX(30px);
-            }
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-30px) translateX(30px); }
         }
 
         .container {
             max-width: 700px;
             margin: 0 auto;
             position: relative;
-            z-index: 1;
         }
 
         .form-card {
@@ -134,7 +124,6 @@
             stroke: #a0aec0;
             stroke-width: 2;
             fill: none;
-            pointer-events: none;
         }
 
         .form-control {
@@ -143,11 +132,9 @@
             border-radius: 12px;
             border: 2px solid #e2e8f0;
             background: #fff;
-            color: #2d3748;
             font-size: 15px;
             outline: none;
             transition: all 0.3s ease;
-            font-family: inherit;
         }
 
         .form-control.has-icon {
@@ -159,76 +146,9 @@
             box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
         }
 
-        .form-control::placeholder {
-            color: #cbd5e0;
-        }
-
         textarea.form-control {
             min-height: 120px;
             resize: vertical;
-        }
-
-        /* Custom file input */
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            background: #f7fafc;
-            border: 2px dashed #cbd5e0;
-            border-radius: 12px;
-            padding: 32px 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .file-input-wrapper:hover {
-            border-color: #667eea;
-            background: #f0f4ff;
-        }
-
-        .file-input-wrapper.dragover {
-            border-color: #667eea;
-            background: #e6edff;
-        }
-
-        .file-input-wrapper input[type="file"] {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .file-icon {
-            width: 48px;
-            height: 48px;
-            margin: 0 auto 16px;
-            stroke: #a0aec0;
-            stroke-width: 2;
-            fill: none;
-        }
-
-        .file-text {
-            color: #4a5568;
-            font-size: 14px;
-            margin-bottom: 4px;
-        }
-
-        .file-hint {
-            color: #a0aec0;
-            font-size: 13px;
-        }
-
-        .file-name {
-            margin-top: 12px;
-            padding: 8px 16px;
-            background: #667eea;
-            color: white;
-            border-radius: 8px;
-            font-size: 13px;
-            display: inline-block;
         }
 
         .btn-group {
@@ -246,38 +166,11 @@
             font-size: 16px;
             cursor: pointer;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn-primary:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
         }
 
         .btn-secondary {
@@ -287,151 +180,116 @@
 
         .btn-secondary:hover {
             background: #cbd5e0;
-            transform: translateY(-2px);
         }
 
-        /* Input focus animations */
-        @keyframes inputFocus {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.02);
-            }
-
-            100% {
-                transform: scale(1);
-            }
+        /* Preview box */
+        #previewContainer {
+            margin-top: 15px;
+            display: none;
+            text-align: center;
         }
 
-        .form-control:focus {
-            animation: inputFocus 0.3s ease;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .form-card {
-                padding: 36px 28px;
-            }
-
-            h2 {
-                font-size: 28px;
-            }
-
-            .btn-group {
-                flex-direction: column;
-            }
+        #previewImage {
+            max-width: 200px;
+            border-radius: 12px;
         }
     </style>
 </head>
 
 <body>
+
     <div class="container">
         <div class="form-card">
+
             <div class="header-section">
                 <div class="icon-wrapper">
                     <svg viewBox="0 0 24 24">
-                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
                     </svg>
                 </div>
                 <h2>Create New Product</h2>
                 <p class="subtitle">Fill in the information below to add a new product</p>
             </div>
 
-            <form th:action="@{/admin/products/create}" method="post" enctype="multipart/form-data">
+            <form th:action="@{/admin/products/create}" method="post">
+
+                <!-- Name -->
                 <div class="mb-3">
                     <label for="name">Product Name</label>
                     <div class="input-wrapper">
                         <svg class="input-icon" viewBox="0 0 24 24">
-                            <path
-                                d="M20 7h-9M14 17H5M16 7a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM8 17a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
+                            <path d="M20 7h-9M14 17H5M16 7a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM8 17a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
                         </svg>
-                        <input type="text" id="name" name="name" class="form-control has-icon"
-                            placeholder="Enter product name" required />
+                        <input type="text" id="name" name="name" class="form-control has-icon" required>
                     </div>
                 </div>
 
+                <!-- Price -->
                 <div class="mb-3">
                     <label for="price">Price</label>
                     <div class="input-wrapper">
                         <svg class="input-icon" viewBox="0 0 24 24">
-                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
                         </svg>
-                        <input type="number" id="price" step="0.01" name="price" class="form-control has-icon"
-                            placeholder="0.00" required />
+                        <input type="number" id="price" step="0.01" name="price" class="form-control has-icon" required>
                     </div>
                 </div>
 
+                <!-- Description -->
                 <div class="mb-3">
                     <label for="description">Description</label>
-                    <div class="input-wrapper">
-                        <textarea id="description" name="description" class="form-control"
-                            placeholder="Enter product description..." required></textarea>
-                    </div>
+                    <textarea id="description" name="description" class="form-control" required></textarea>
                 </div>
 
+                <!-- Image URL -->
                 <div class="mb-3">
                     <label for="imageUrl">Product Image URL</label>
+
                     <div class="input-wrapper">
                         <svg class="input-icon" viewBox="0 0 24 24">
-                            <path d="M21 15l-5-5L5 21M3 3h18v18H3V3zm5.5 7a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z" />
+                            <path d="M21 15l-5-5L5 21M3 3h18v18H3V3zm5.5 7a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
                         </svg>
-
-                        <input type="text" id="imageUrl" name="imageUrl" class="form-control has-icon"
-                            placeholder="Paste image URL here (e.g. https://...)" required />
+                        <input type="text" id="imageUrl" name="imageUrl"
+                               class="form-control has-icon"
+                               placeholder="Paste image URL here (https://...)"
+                               required>
                     </div>
 
                     <small style="color:#888;">Enter a direct image link (JPG, PNG, GIF)</small>
+
+                    <div id="previewContainer">
+                        <img id="previewImage" src="" alt="Preview">
+                    </div>
                 </div>
 
-
+                <!-- Buttons -->
                 <div class="btn-group">
                     <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
                     <button type="submit" class="btn btn-primary">Create Product</button>
                 </div>
+
             </form>
+
         </div>
     </div>
 
+    <!-- Image Preview Script -->
     <script>
-        // File input handling
-        const fileInput = document.getElementById('imageFile');
-        const fileInputWrapper = document.getElementById('fileInputWrapper');
-        const fileNameDisplay = document.getElementById('fileName');
+        const imageUrlInput = document.getElementById("imageUrl");
+        const previewContainer = document.getElementById("previewContainer");
+        const previewImage = document.getElementById("previewImage");
 
-        fileInput.addEventListener('change', function (e) {
-            if (e.target.files.length > 0) {
-                const fileName = e.target.files[0].name;
-                fileNameDisplay.textContent = fileName;
-                fileNameDisplay.style.display = 'inline-block';
-            }
-        });
+        imageUrlInput.addEventListener("input", function () {
+            const url = imageUrlInput.value.trim();
 
-        // Drag and drop functionality
-        fileInputWrapper.addEventListener('dragover', function (e) {
-            e.preventDefault();
-            fileInputWrapper.classList.add('dragover');
-        });
-
-        fileInputWrapper.addEventListener('dragleave', function (e) {
-            e.preventDefault();
-            fileInputWrapper.classList.remove('dragover');
-        });
-
-        fileInputWrapper.addEventListener('drop', function (e) {
-            e.preventDefault();
-            fileInputWrapper.classList.remove('dragover');
-
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                fileInput.files = files;
-                const fileName = files[0].name;
-                fileNameDisplay.textContent = fileName;
-                fileNameDisplay.style.display = 'inline-block';
+            if (url.startsWith("http://") || url.startsWith("https://")) {
+                previewImage.src = url;
+                previewContainer.style.display = "block";
+            } else {
+                previewContainer.style.display = "none";
             }
         });
     </script>
-</body>
 
+</body>
 </html>
