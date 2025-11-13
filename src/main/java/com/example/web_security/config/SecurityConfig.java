@@ -1,4 +1,3 @@
-
 package com.example.web_security.config;
 
 import java.util.Arrays;
@@ -22,7 +21,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.example.web_security.Repo.UsersRepository; // Sửa package
+import com.example.web_security.Repo.UsersRepository;
 import com.example.web_security.restapi.JwtAuthFilter;
 
 @Configuration
@@ -52,37 +51,37 @@ public class SecurityConfig {
         public AuthenticationManager authenticationManager(HttpSecurity http,
                         UserDetailsService userDetailsService,
                         PasswordEncoder passwordEncoder) throws Exception {
-                AuthenticationManagerBuilder authenticationManagerBuilder = http
-                                .getSharedObject(AuthenticationManagerBuilder.class);
-                authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
-                return authenticationManagerBuilder.build();
+
+                AuthenticationManagerBuilder auth = http.getSharedObject(AuthenticationManagerBuilder.class);
+                auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+                return auth.build();
         }
 
+        // ================== CORS CHO API ==================
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
-                CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Địa chỉ React app
-                configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE",
-                                "OPTIONS"));
-                configuration.setAllowedHeaders(Arrays.asList("Authorization",
-                                "Content-Type", "X-Requested-With"));
-                configuration.setAllowCredentials(true);
-                configuration.setMaxAge(3600L);
+                CorsConfiguration config = new CorsConfiguration();
+
+                config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+                config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+                config.setAllowCredentials(true);
+                config.setMaxAge(3600L);
 
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-                source.registerCorsConfiguration("/**", configuration);
+                source.registerCorsConfiguration("/**", config);
                 return source;
         }
 
-        // SecurityFilterChain cho các endpoint /api/** (dùng JWT)
+        // ================== SECURITY API ==================
         @Bean
         @Order(1)
         public SecurityFilterChain apiFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
-                http
-                                .securityMatcher("/api/**") // Chỉ áp dụng cho các yêu cầu /api/**
+
+                http.securityMatcher("/api/**")
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                                .csrf(csrf -> csrf.disable()) // Tắt CSRF cho API
-                                .formLogin(form -> form.disable()) // Tắt form login cho /api/**
+                                .csrf(csrf -> csrf.disable())
+                                .formLogin(form -> form.disable())
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers("/api/register", "/api/generateToken", "/api/welcome")
                                                 .permitAll()
@@ -90,36 +89,42 @@ public class SecurityConfig {
                                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                                 .anyRequest().authenticated())
                                 .sessionManagement(session -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stateless cho
-                                // API
-                                )
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
                 return http.build();
         }
 
-        // SecurityFilterChain cho các endpoint còn lại (dùng form login)
-        // SecurityFilterChain cho các endpoint còn lại (dùng form login)
+        // ================== SECURITY WEB FORM LOGIN ==================
         @Bean
         @Order(2)
         public SecurityFilterChain formLoginFilterChain(HttpSecurity http) throws Exception {
-                http
-                                .authorizeHttpRequests(auth -> auth
-                                                // Admin có quyền truy cập vào các đường dẫn /admin/**
-                                                .requestMatchers("/admin/**").hasRole("ADMIN")
-                                                // User có quyền truy cập vào các đường dẫn /user/**
-                                                .requestMatchers("/user/**").hasRole("USER")
-                                                // Các trang login, register, H2 console không yêu cầu xác thực
-                                                .requestMatchers("/login", "/register", "/h2-console/**").permitAll()
-                                                // Các yêu cầu khác yêu cầu xác thực
-                                                .anyRequest().authenticated())
+
+                http.authorizeHttpRequests(auth -> auth
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/user/**").hasRole("USER")
+
+                                // Cho phép login/register
+                                .requestMatchers("/login", "/register", "/h2-console/**").permitAll()
+
+                                // ⭐ Cho phép xem ảnh trong static/images
+                                .requestMatchers("/images/**").permitAll()
+
+                                // Cho phép uploads nếu có
+                                .requestMatchers("/uploads/**").permitAll()
+
+                                // Cho phép trang shop/home/search
+                                .requestMatchers("/", "/shop", "/search").permitAll()
+
+                                .anyRequest().authenticated())
+
                                 .formLogin(form -> form
                                                 .loginPage("/login")
                                                 .successHandler((request, response, authentication) -> {
-                                                        // check role
                                                         var authorities = authentication.getAuthorities();
-                                                        if (authorities.stream().anyMatch(
-                                                                        a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+                                                        if (authorities.stream()
+                                                                        .anyMatch(a -> a.getAuthority()
+                                                                                        .equals("ROLE_ADMIN"))) {
                                                                 response.sendRedirect("/admin");
                                                         } else {
                                                                 response.sendRedirect("/shop");
@@ -133,10 +138,10 @@ public class SecurityConfig {
                                                 .permitAll()
                                                 .invalidateHttpSession(true)
                                                 .deleteCookies("JSESSIONID"))
+
                                 .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
-                                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
+                                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
 
                 return http.build();
         }
-
 }

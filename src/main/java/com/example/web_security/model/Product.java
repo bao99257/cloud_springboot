@@ -1,5 +1,6 @@
 package com.example.web_security.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,7 +17,11 @@ public class Product {
 
     private String name;
     private Double price;
-    private String imageUrl; // link ảnh sản phẩm
+
+    @Column(columnDefinition = "TEXT") // Cho link ảnh dài
+    private String imageUrl;
+
+    @Column(columnDefinition = "TEXT") // Mô tả dài
     private String description;
 
     // Constructor mặc định

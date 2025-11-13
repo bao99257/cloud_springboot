@@ -3,293 +3,88 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Product</title>
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 40px 20px;
-            overflow-x: hidden;
         }
-
-        body::before {
-            content: '';
-            position: fixed;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, transparent 70%);
-            top: -200px;
-            right: -200px;
-            animation: float 8s ease-in-out infinite;
-        }
-
-        body::after {
-            content: '';
-            position: fixed;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(118, 75, 162, 0.3) 0%, transparent 70%);
-            bottom: -150px;
-            left: -150px;
-            animation: float 10s ease-in-out infinite reverse;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) translateX(0); }
-            50% { transform: translateY(-30px) translateX(30px); }
-        }
-
-        .container {
-            max-width: 700px;
-            margin: 0 auto;
-            position: relative;
-        }
-
+        .container { max-width: 700px; margin: auto; }
         .form-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
+            background: white;
+            padding: 40px;
             border-radius: 24px;
-            padding: 48px 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-
-        .header-section {
-            margin-bottom: 40px;
-        }
-
-        .icon-wrapper {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-        }
-
-        .icon-wrapper svg {
-            width: 36px;
-            height: 36px;
-            stroke: white;
-            stroke-width: 2;
-            fill: none;
-        }
-
-        h2 {
-            color: #1a202c;
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .subtitle {
-            color: #718096;
-            font-size: 15px;
-        }
-
-        .mb-3 {
-            margin-bottom: 28px;
-        }
-
-        label {
-            display: block;
-            color: #2d3748;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 20px;
-            height: 20px;
-            stroke: #a0aec0;
-            stroke-width: 2;
-            fill: none;
-        }
-
+        .mb-3 { margin-bottom: 25px; }
+        label { font-weight: 600; margin-bottom: 10px; display: block; }
         .form-control {
-            width: 100%;
-            padding: 14px 16px;
-            border-radius: 12px;
-            border: 2px solid #e2e8f0;
-            background: #fff;
-            font-size: 15px;
-            outline: none;
-            transition: all 0.3s ease;
+            width: 100%; padding: 14px;
+            border-radius: 12px; font-size: 15px;
+            border: 2px solid #ccc;
         }
-
-        .form-control.has-icon {
-            padding-left: 48px;
-        }
-
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-        }
-
-        textarea.form-control {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 32px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 14px 28px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: #e2e8f0;
-            color: #4a5568;
-        }
-
-        .btn-secondary:hover {
-            background: #cbd5e0;
-        }
-
-        /* Preview box */
-        #previewContainer {
-            margin-top: 15px;
-            display: none;
-            text-align: center;
-        }
-
-        #previewImage {
-            max-width: 200px;
-            border-radius: 12px;
-        }
+        textarea { min-height: 120px; }
+        .btn-primary { padding: 12px 18px; border: none; background: #667eea; color: #fff; border-radius: 12px; }
+        .btn-secondary { padding: 12px 18px; border: none; background: #aaa; border-radius: 12px; }
+        #previewImage { margin-top: 15px; max-width: 250px; border-radius: 12px; display: none; }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
-        <div class="form-card">
+<div class="container">
+    <div class="form-card">
 
-            <div class="header-section">
-                <div class="icon-wrapper">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                    </svg>
-                </div>
-                <h2>Create New Product</h2>
-                <p class="subtitle">Fill in the information below to add a new product</p>
+        <h2>Create Product</h2>
+
+        <form th:action="@{/admin/products/create}" method="post">
+
+            <div class="mb-3">
+                <label>Product Name</label>
+                <input type="text" class="form-control" name="name" required>
             </div>
 
-            <form th:action="@{/admin/products/create}" method="post">
+            <div class="mb-3">
+                <label>Price</label>
+                <input type="number" step="0.01" class="form-control" name="price" required>
+            </div>
 
-                <!-- Name -->
-                <div class="mb-3">
-                    <label for="name">Product Name</label>
-                    <div class="input-wrapper">
-                        <svg class="input-icon" viewBox="0 0 24 24">
-                            <path d="M20 7h-9M14 17H5M16 7a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM8 17a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
-                        </svg>
-                        <input type="text" id="name" name="name" class="form-control has-icon" required>
-                    </div>
-                </div>
+            <div class="mb-3">
+                <label>Description</label>
+                <textarea class="form-control" name="description" required></textarea>
+            </div>
 
-                <!-- Price -->
-                <div class="mb-3">
-                    <label for="price">Price</label>
-                    <div class="input-wrapper">
-                        <svg class="input-icon" viewBox="0 0 24 24">
-                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                        </svg>
-                        <input type="number" id="price" step="0.01" name="price" class="form-control has-icon" required>
-                    </div>
-                </div>
+            <div class="mb-3">
+                <label>Image URL</label>
+                <input type="text" class="form-control" name="imageUrl" id="imageUrl" placeholder="https://example.com/image.png" required>
+                <img id="previewImage">
+            </div>
 
-                <!-- Description -->
-                <div class="mb-3">
-                    <label for="description">Description</label>
-                    <textarea id="description" name="description" class="form-control" required></textarea>
-                </div>
+            <button class="btn btn-primary" type="submit">Create</button>
+            <a href="/admin" class="btn btn-secondary">Cancel</a>
 
-                <!-- Image URL -->
-                <div class="mb-3">
-                    <label for="imageUrl">Product Image URL</label>
+        </form>
 
-                    <div class="input-wrapper">
-                        <svg class="input-icon" viewBox="0 0 24 24">
-                            <path d="M21 15l-5-5L5 21M3 3h18v18H3V3zm5.5 7a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
-                        </svg>
-                        <input type="text" id="imageUrl" name="imageUrl"
-                               class="form-control has-icon"
-                               placeholder="Paste image URL here (https://...)"
-                               required>
-                    </div>
-
-                    <small style="color:#888;">Enter a direct image link (JPG, PNG, GIF)</small>
-
-                    <div id="previewContainer">
-                        <img id="previewImage" src="" alt="Preview">
-                    </div>
-                </div>
-
-                <!-- Buttons -->
-                <div class="btn-group">
-                    <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Create Product</button>
-                </div>
-
-            </form>
-
-        </div>
     </div>
+</div>
 
-    <!-- Image Preview Script -->
-    <script>
-        const imageUrlInput = document.getElementById("imageUrl");
-        const previewContainer = document.getElementById("previewContainer");
-        const previewImage = document.getElementById("previewImage");
+<script>
+    const input = document.getElementById("imageUrl");
+    const preview = document.getElementById("previewImage");
 
-        imageUrlInput.addEventListener("input", function () {
-            const url = imageUrlInput.value.trim();
-
-            if (url.startsWith("http://") || url.startsWith("https://")) {
-                previewImage.src = url;
-                previewContainer.style.display = "block";
-            } else {
-                previewContainer.style.display = "none";
-            }
-        });
-    </script>
+    input.addEventListener("input", () => {
+        if (input.value.trim().length > 5) {
+            preview.src = input.value;
+            preview.style.display = "block";
+        } else {
+            preview.style.display = "none";
+        }
+    });
+</script>
 
 </body>
 </html>

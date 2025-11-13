@@ -13,6 +13,7 @@ import com.example.web_security.model.Users;
 import com.example.web_security.model.Product;
 
 import jakarta.annotation.PostConstruct;
+
 import java.util.List;
 
 @Controller
@@ -60,7 +61,7 @@ public class UserController {
         return "redirect:/login";
     }
 
-    // ------------------- ADMIN QUẢN LÝ USER -------------------
+    // ------------------- ADMIN PAGE -------------------
     @GetMapping("/admin")
     public String adminPage(Model model) {
         model.addAttribute("users", userRepository.findAll());
@@ -68,6 +69,7 @@ public class UserController {
         return "admin";
     }
 
+    // ------------------- MANAGE USER -------------------
     @GetMapping("/admin/create")
     public String showCreateUserForm(Model model) {
         model.addAttribute("user", new Users());
@@ -162,7 +164,11 @@ public class UserController {
         return "redirect:/user";
     }
 
-    // ------------------- CRUD PRODUCT (Admin) -------------------
+    // -------------------------------------------------------------
+    // ---------------------- PRODUCT CRUD (URL ONLY) ---------------
+    // -------------------------------------------------------------
+
+    // CREATE PRODUCT
     @GetMapping("/admin/products/create")
     public String showCreateProductForm(Model model) {
         model.addAttribute("product", new Product());
@@ -170,11 +176,24 @@ public class UserController {
     }
 
     @PostMapping("/admin/products/create")
-    public String createProduct(@ModelAttribute Product product) {
-        productRepository.save(product);
+    public String createProduct(
+            @RequestParam("name") String name,
+            @RequestParam("price") Double price,
+            @RequestParam("description") String description,
+            @RequestParam("imageUrl") String imageUrl) {
+
+        Product p = new Product();
+        p.setName(name);
+        p.setPrice(price);
+        p.setDescription(description);
+        p.setImageUrl(imageUrl);
+
+        productRepository.save(p);
+
         return "redirect:/admin";
     }
 
+    // EDIT PRODUCT
     @GetMapping("/admin/products/edit/{id}")
     public String editProduct(@PathVariable Long id, Model model) {
         Product product = productRepository.findById(id)
@@ -184,25 +203,33 @@ public class UserController {
     }
 
     @PostMapping("/admin/products/update")
-    public String updateProduct(@ModelAttribute Product product) {
-        Product existingProduct = productRepository.findById(product.getId())
+    public String updateProduct(
+            @RequestParam("id") Long id,
+            @RequestParam("name") String name,
+            @RequestParam("price") Double price,
+            @RequestParam("description") String description,
+            @RequestParam("imageUrl") String imageUrl) {
+
+        Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-        existingProduct.setName(product.getName());
-        existingProduct.setPrice(product.getPrice());
-        existingProduct.setDescription(product.getDescription());
-        existingProduct.setImageUrl(product.getImageUrl());
+        product.setName(name);
+        product.setPrice(price);
+        product.setDescription(description);
+        product.setImageUrl(imageUrl);
 
-        productRepository.save(existingProduct);
+        productRepository.save(product);
         return "redirect:/admin";
     }
 
+    // DELETE PRODUCT
     @GetMapping("/admin/products/delete/{id}")
     public String deleteProduct(@PathVariable Long id) {
         productRepository.deleteById(id);
         return "redirect:/admin";
     }
 
+    // SEARCH
     @GetMapping("/search")
     public String searchProducts(@RequestParam("keyword") String keyword, Model model) {
         List<Product> results = productRepository.findByNameContainingIgnoreCase(keyword);
@@ -211,7 +238,7 @@ public class UserController {
         return "search";
     }
 
-    // ------------------- SHOP PAGE -------------------
+    // SHOP PAGE
     @GetMapping("/shop")
     public String shopPage(Model model) {
         model.addAttribute("products", productRepository.findAll());
