@@ -244,4 +244,15 @@ public class UserController {
         model.addAttribute("products", productRepository.findAll());
         return "shop";
     }
+
+    // PRODUCT DETAIL PAGE
+    @GetMapping("/product/{id}")
+    public String productDetail(@PathVariable Long id, Model model) {
+        Product p = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        model.addAttribute("product", p);
+        return "product_detail";
+    }
+
 }
