@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -107,14 +108,15 @@ public class SecurityConfig {
                                 // Cho phép login/register
                                 .requestMatchers("/login", "/register", "/h2-console/**").permitAll()
 
-                                // ⭐ Cho phép xem ảnh trong static/images
-                                .requestMatchers("/images/**").permitAll()
+                                // Ảnh, uploads
+                                .requestMatchers("/images/**", "/uploads/**").permitAll()
 
-                                // Cho phép uploads nếu có
-                                .requestMatchers("/uploads/**").permitAll()
+                                // ⭐ Cho phép giỏ hàng (GET, POST, DELETE)
+                                .requestMatchers("/cart/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/cart/add/**").permitAll()
 
-                                // Cho phép trang shop/home/search
-                                .requestMatchers("/", "/shop", "/search").permitAll()
+                                // Trang shop/home/search + product detail
+                                .requestMatchers("/", "/shop", "/search", "/product/**").permitAll()
 
                                 .anyRequest().authenticated())
 
@@ -139,7 +141,13 @@ public class SecurityConfig {
                                                 .invalidateHttpSession(true)
                                                 .deleteCookies("JSESSIONID"))
 
-                                .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
+                                // ⭐ FIX CSRF — BỎ CHẶN CHO GIỎ HÀNG
+                                .csrf(csrf -> csrf
+                                                .ignoringRequestMatchers(
+                                                                "/h2-console/**",
+                                                                "/cart/**" // <-- QUAN TRỌNG
+                                                ))
+
                                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
 
                 return http.build();

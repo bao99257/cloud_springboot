@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ hàng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .cart-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        h2 {
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 30px;
+            position: relative;
+            padding-bottom: 15px;
+            font-size: 32px;
+        }
+        
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+        
+        .empty-cart {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 16px;
+            color: white;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .empty-cart svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+        
+        .empty-cart h4 {
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .empty-cart a {
+            color: white;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+        
+        .cart-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .cart-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-color: #e2e8f0;
+        }
+        
+        .product-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .product-name {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .product-price {
+            color: #e53e3e;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        
+        .product-quantity {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .product-total {
+            color: #38a169;
+            font-weight: 700;
+            font-size: 22px;
+        }
+        
+        .btn-remove {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-remove:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+            color: white;
+        }
+        
+        .total-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-top: 30px;
+        }
+        
+        .total-section h4 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .total-amount {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 25px;
+        }
+        
+        .btn-clear {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-clear:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .btn-checkout {
+            background: white;
+            color: #667eea;
+            padding: 12px 32px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-checkout:hover {
+            background: #f7fafc;
+            color: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .item-row {
+            display: grid;
+            grid-template-columns: 100px 1fr auto;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .item-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .item-meta {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        @media (max-width: 768px) {
+            .cart-container {
+                padding: 30px 20px;
+            }
+            
+            .item-row {
+                grid-template-columns: 80px 1fr;
+                gap: 15px;
+            }
+            
+            .item-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .btn-remove {
+                width: 100%;
+                margin-top: 10px;
+            }
+            
+            h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="cart-container">
+        <h2 class="text-center">🛒 GIỎ HÀNG CỦA BẠN</h2>
+
+        <div th:if="${items.size() == 0}" class="empty-cart">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+            <h4>Giỏ hàng của bạn đang trống</h4>
+            <p>Hãy thêm sản phẩm yêu thích vào giỏ hàng ngay!</p>
+            <a href="/shop">Tiếp tục mua sắm →</a>
+        </div>
+
+        <div th:if="${items.size() > 0}">
+            <div th:each="item : ${items}" class="cart-item">
+                <div class="item-row">
+                    <img th:src="@{${item.product.imageUrl}}"
+                         class="product-image"
+                         alt="Product image">
+                    
+                    <div class="item-details">
+                        <div class="product-name" th:text="${item.product.name}"></div>
+                        <div class="item-meta">
+                            <div class="product-price" th:text="${item.product.price} + ' đ'"></div>
+                            <div class="product-quantity">
+                                Số lượng: <span th:text="${item.quantity}"></span>
+                            </div>
+                            <div class="product-total" th:text="${item.product.price * item.quantity} + ' đ'"></div>
+                        </div>
+                    </div>
+                    
+                    <a th:href="@{'/cart/remove/' + ${item.product.id}}"
+                       class="btn btn-remove">Xóa</a>
+                </div>
+            </div>
+
+            <div class="total-section">
+                <div class="text-center">
+                    <h4>Tổng thanh toán</h4>
+                    <div class="total-amount" th:text="${total} + ' đ'"></div>
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <a href="/cart/clear" class="btn btn-clear">Xóa toàn bộ</a>
+                        <a href="/checkout" class="btn btn-checkout">Thanh toán ngay</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

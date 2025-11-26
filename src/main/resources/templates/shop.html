@@ -468,7 +468,15 @@
     </style>
 </head>
 
+
 <body>
+    <!-- Toast Notify -->
+    <div id="toast" style="position: fixed; top: 20px; right: 20px; 
+            background: #28a745; color: white; padding: 15px 25px;
+            border-radius: 8px; display: none; z-index: 9999;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+        Đã thêm vào giỏ hàng!
+    </div>
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top navbar-custom">
         <div class="container">
             <a class="navbar-brand fw-bold" href="/shop">FASHION SHOP</a>
@@ -487,7 +495,10 @@
             </form>
 
             <div class="d-flex navbar-icons">
-                <a class="nav-link cart-icon" href="#"><i class="fas fa-shopping-cart"></i></a>
+                <a class="nav-link cart-icon" th:href="@{/cart}">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+
                 <a class="nav-link d-flex align-items-center" th:href="@{/user}">
                     <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="user-avatar"
                         alt="User Avatar">
@@ -509,6 +520,32 @@
             </div>
         </div>
     </div>
+    <script>
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.style.display = "block";
+            setTimeout(() => {
+                toast.style.display = "none";
+            }, 2500);
+        }
+
+        function addToCart(productId) {
+            fetch(`/cart/add/${productId}`, {
+                method: "POST"
+            })
+                .then(res => {
+                    if (res.ok) {
+                        showToast("Thêm sản phẩm vào giỏ hàng thành công!");
+                    } else {
+                        showToast("Không thể thêm sản phẩm!");
+                    }
+                })
+                .catch(() => {
+                    showToast("Lỗi kết nối server!");
+                });
+        }
+    </script>
 
     <div class="container mt-5 mb-5">
         <h3 class="section-title">SẢN PHẨM MỚI NHẤT</h3>
@@ -520,9 +557,22 @@
                     <div class="card-body text-center">
                         <h5 th:text="${p.name}">Áo Hoodie Thể Thao Nam</h5>
                         <span class="price" th:text="${p.price}">1.200.000 VNĐ</span>
-                        <a th:href="@{'/product/' + ${p.id}}" class="btn btn-add-to-cart btn-sm">
-                            <i class="fas fa-shopping-cart"></i> Mua ngay
-                        </a>
+                        <div class="d-flex justify-content-between gap-2 mt-3">
+
+                            <a th:href="@{'/product/' + ${p.id}}" class="btn btn-detail btn-sm w-50">
+                                <i class="fas fa-eye"></i> Chi tiết
+                            </a>
+
+                            <button class="btn btn-add-to-cart btn-sm w-50" th:onclick="'addToCart(' + ${p.id} + ')'">
+                                <i class="fas fa-cart-plus"></i> Thêm giỏ
+                            </button>
+
+                        </div>
+
+
+
+
+
                     </div>
                 </div>
             </div>
@@ -539,9 +589,19 @@
                     <div class="card-body">
                         <h5 th:text="${p.name}"></h5>
                         <span class="price" th:text="${p.price} + ' đ'"></span>
-                        <button class="btn-add-to-cart">
-                            <i class="fas fa-cart-plus"></i> Mua ngay
-                        </button>
+                        <div class="d-flex justify-content-between gap-2 mt-3">
+
+                            <a th:href="@{'/product/' + ${p.id}}" class="btn btn-detail btn-sm w-50">
+                                <i class="fas fa-eye"></i> Chi tiết
+                            </a>
+
+                            <button class="btn btn-add-to-cart btn-sm w-50" th:onclick="'addToCart(' + ${p.id} + ')'">
+                                <i class="fas fa-cart-plus"></i> Thêm giỏ
+                            </button>
+
+                        </div>
+
+
                     </div>
                 </div>
             </div>

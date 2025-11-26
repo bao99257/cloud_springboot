@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.web_security.Repo.UsersRepository;
 import com.example.web_security.Repo.ProductRepository;
 import com.example.web_security.model.Users;
+import com.example.web_security.service.CartService;
 import com.example.web_security.model.Product;
 
 import jakarta.annotation.PostConstruct;
@@ -27,6 +28,9 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private CartService cartService;
 
     // ------------------- INIT ADMIN -------------------
     @PostConstruct
@@ -253,6 +257,33 @@ public class UserController {
 
         model.addAttribute("product", p);
         return "product_detail";
+    }
+
+    // ------------------- CART -------------------
+    @PostMapping("/cart/add/{id}")
+    @ResponseBody
+    public String addToCart(@PathVariable Long id) {
+        cartService.addProduct(id);
+        return "OK";
+    }
+
+    @GetMapping("/cart")
+    public String viewCart(Model model) {
+        model.addAttribute("items", cartService.getCartDetails());
+        model.addAttribute("total", cartService.getTotalPrice());
+        return "cart";
+    }
+
+    @GetMapping("/cart/remove/{id}")
+    public String removeItem(@PathVariable Long id) {
+        cartService.removeItem(id);
+        return "redirect:/cart";
+    }
+
+    @GetMapping("/cart/clear")
+    public String clearCart() {
+        cartService.clearCart();
+        return "redirect:/cart";
     }
 
 }
